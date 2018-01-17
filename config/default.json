@@ -1,0 +1,15 @@
+{
+    "connection": {
+        "server": "DLTPRONCHAIA",
+        "userName": "sa",
+        "password": "P@ssw0rd",
+        "options": {
+            "idleTimeoutMillis": 300000,
+            "connectTimeout": 300000,
+            "requestTimeout": 300000,
+            "max": 100,
+            "encrypt": true,
+            "database": "smiletradedb"
+        }
+    }
+}
