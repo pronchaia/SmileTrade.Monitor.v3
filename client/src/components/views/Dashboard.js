@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Card from '../common/Card';
+import DealChart from '../common/DealChart';
 
 class Dashboard extends Component {
     constructor() {
@@ -30,6 +31,9 @@ class Dashboard extends Component {
                     <Card Key='DEALPREPARATION' />
                     <Card Key='NEWDEAL' />
                     <Card Key='NEWCOUNTERPARTYSAP' />
+                </div>
+                <div>
+                    <DealChart />
                 </div>
             </div>
         );
