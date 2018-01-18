@@ -5,6 +5,10 @@ import { Line } from 'react-chartjs-2';
 class DealChart extends Component {
     constructor() {
         super();
+        this.state = {
+            labels: [],
+            datasets: []
+        }
     }
 
     render() {

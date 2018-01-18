@@ -75,5 +75,23 @@ router.get('/deal-today-percentage/', function (req, res) {
         .into(res, '[]');
 });
 
+router.get('/backgroundjob-days/', function (req, res) {
+    var sql = fs.readFileSync('./sql/dashboard/backgroundjob-days.sql').toString();
+    req.query(sql)
+        .into(res, '[]');
+});
+
+router.get('/backgroundjob-sap/', function (req, res) {
+    var sql = fs.readFileSync('./sql/dashboard/backgroundjob-sap.sql').toString();
+    req.query(sql)
+        .into(res, '[]');
+});
+
+router.get('/backgroundjob-morning/', function (req, res) {
+    var sql = fs.readFileSync('./sql/dashboard/backgroundjob-morning.sql').toString();
+    req.query(sql)
+        .into(res, '[]');
+});
+
 
 module.exports = router;

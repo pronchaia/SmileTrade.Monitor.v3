@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Card from '../common/Card';
-import DealChart from '../common/DealChart';
+import BackGroundJobChart from '../common/BackGroundJobChart';
 
 class Dashboard extends Component {
     constructor() {
@@ -32,8 +32,11 @@ class Dashboard extends Component {
                     <Card Key='NEWDEAL' />
                     <Card Key='NEWCOUNTERPARTYSAP' />
                 </div>
-                <div>
-                    <DealChart />
+                <div className="row">
+                    <div className="col-lg-6 col-xs-12 col-sm-12">
+                        <BackGroundJobChart />
+                    </div>
+
                 </div>
             </div>
         );
