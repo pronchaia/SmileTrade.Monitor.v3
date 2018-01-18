@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Card from '../common/Card';
 import BackGroundJobChart from '../common/BackGroundJobChart';
+import EmailChart from '../common/EmailChart';
 
 class Dashboard extends Component {
     constructor() {
@@ -36,7 +37,9 @@ class Dashboard extends Component {
                     <div className="col-lg-6 col-xs-12 col-sm-12">
                         <BackGroundJobChart />
                     </div>
-
+                    <div className="col-lg-6 col-xs-12 col-sm-12">
+                        <EmailChart />
+                    </div>
                 </div>
             </div>
         );

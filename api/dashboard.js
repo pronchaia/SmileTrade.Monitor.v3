@@ -87,8 +87,20 @@ router.get('/backgroundjob-sap/', function (req, res) {
         .into(res, '[]');
 });
 
+router.get('/backgroundjob-email-sap/', function (req, res) {
+    var sql = fs.readFileSync('./sql/dashboard/backgroundjob-email-sap.sql').toString();
+    req.query(sql)
+        .into(res, '[]');
+});
+
 router.get('/backgroundjob-morning/', function (req, res) {
     var sql = fs.readFileSync('./sql/dashboard/backgroundjob-morning.sql').toString();
+    req.query(sql)
+        .into(res, '[]');
+});
+
+router.get('/backgroundjob-email-morning/', function (req, res) {
+    var sql = fs.readFileSync('./sql/dashboard/backgroundjob-email-morning.sql').toString();
     req.query(sql)
         .into(res, '[]');
 });
