@@ -15,7 +15,7 @@ class Header extends Component {
                     <div className="page-top">
                         <form className="search-form search-form-expanded" action="/" method="GET">
                             <div className="input-group">
-                                <input type="text" className="form-control" placeholder="Search..." name="query" />
+                                <input type="text" className="form-control" placeholder="Search deal ..." name="query" />
                                 <span className="input-group-btn">
                                     <a href="javascript:;" className="btn submit">
                                         <i className="icon-magnifier"></i>

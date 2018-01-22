@@ -5,6 +5,7 @@ import Dashboard from './components/views/Dashboard';
 import Tracer from './components/views/Tracer';
 import CreditEmail from './components/views/CreditEmail';
 import CpWorstdate from './components/views/CpWorstdate';
+import Deal from './components/views/Deal';
 
 // The Main component renders one of the three provided
 // Routes (provided that one matches). Both the /roster
@@ -18,6 +19,7 @@ const Content = () => (
             <Route path="/Tracer" component={Tracer} />
             <Route path="/Email" component={CreditEmail} />
             <Route path="/Worstdate" component={CpWorstdate} />
+            <Route path="/Deal" component={Deal} />
         </Switch>
     </main>
 )

@@ -47,6 +47,15 @@ class Sidebar extends Component {
                                 <span className={(this.props.currentPage === 'cpworstdate') ? 'arrow open' : 'arrow'}></span>
                             </Link>
                         </li>
+
+                        <li className={(this.props.currentPage === 'deal') ? 'nav-item start active open' : 'nav-item  '}>
+                            <Link to='/Deal' onClick={this.change.bind(this, 'deal')} className="nav-link nav-toggle">
+                                <i className="icon-puzzle"></i>
+                                <span className="title">Deal</span>
+                                <span className={(this.props.currentPage === 'deal') ? 'selected' : ''}></span>
+                                <span className={(this.props.currentPage === 'deal') ? 'arrow open' : 'arrow'}></span>
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>

@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
 
-// import Dashboard from './components/views/Dashboard';
-// import Tracer from './components/views/Tracer';
-// import CreditEmail from './components/views/CreditEmail';
-// import CpWorstdate from './components/views/CpWorstdate';
 import Content from './Content'
 
 import './App.css';

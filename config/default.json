@@ -11,5 +11,18 @@
             "encrypt": true,
             "database": "smiletradedb"
         }
+    },
+    "connection-prd": {
+        "server": "ptt-ctrmdb-p01.ptt.corp",
+        "userName": "ctrmreadprdusr",
+        "password": "cctrmreadprdusr",
+        "options": {
+            "idleTimeoutMillis": 300000,
+            "connectTimeout": 300000,
+            "requestTimeout": 300000,
+            "max": 100,
+            "encrypt": true,
+            "database": "smiletradedb"
+        }
     }
 }
