@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import EmailDataGrid from '../common/EmailDataGrid';
+import EmailDataGrid from '../common/creditemail/EmailDataGrid';
 import axios from 'axios';
 
 class CreditEmail extends Component {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Card from '../common/Card';
-import BackGroundJobChart from '../common/BackGroundJobChart';
-import EmailChart from '../common/EmailChart';
+import Card from '../common/dashboard/Card';
+import BackGroundJobChart from '../common/dashboard/BackGroundJobChart';
+import EmailChart from '../common/dashboard/EmailChart';
 
 class Dashboard extends Component {
     constructor() {

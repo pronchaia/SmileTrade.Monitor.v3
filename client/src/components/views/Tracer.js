@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import TracerDataGrid from '../common/TracerDataGrid';
+import TracerDataGrid from '../common/tracer/TracerDataGrid';
 import axios from 'axios';
 
 class Tracer extends Component {

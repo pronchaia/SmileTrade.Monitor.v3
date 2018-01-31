@@ -15,11 +15,7 @@ router.get('/consumption-percentage/', function (req, res) {
         .into(res, '[]');
 });
 
-router.get('/preparationdeal/', function (req, res) {
-    var sql = fs.readFileSync('./sql/preparationdeal.sql').toString();
-    req.query(sql)
-        .into(res, '[]');
-});
+
 
 router.get('/preparationdeal-timeline/', function (req, res) {
     var sql = fs.readFileSync('./sql/preparationdeal-timeline.sql').toString();

@@ -18,6 +18,7 @@ app.get('/api/hello', (req, res) => {
 app.use('/api', require('./api/dashboard'));
 app.use('/api', require('./api/systracer'));
 app.use('/api', require('./api/creditemail'));
+app.use('/api', require('./api/deal'));
 
 
 app.listen(port, () => console.log('Listening on port ${port}'));
