@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 const DealAudit = (props) => {
     let items;
