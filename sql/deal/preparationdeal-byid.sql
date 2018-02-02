@@ -92,14 +92,82 @@ END
 ELSE IF @FK_SyCPTy =2
 BEGIN
     SET @DealType='OTC';
+    INSERT INTO @TempTable
+    SELECT @dealid as DealID,PK_DeOt AS CK_De, 0 as LoadingId,@DealType As DealType
+    ,CASE PSFlag WHEN -1 THEN 'Sale' ELSE 'Purchase' END AS PSFlag,deal.FK_K_SyCSt as  FK_K_SyCSt, StatusName as CreditStatus
+    ,FK_K_SyCPr as FK_K_SyCPr ,Priviledge
+    ,TotalValue,RealValue as UnrealValue,''  AS K_CrOnlySecurityLimit
+    ,cost.NetAmountCompCCy,cost.K_PaymentAmountCompCCy,@ConsumeAmount AS ConsumeAmount,@PaidAmount As PaidAmount
+    ,deal.FK_SySt,SysStructure.Structure,DomainName,kSysCreditStructure.StructureName as CreditStructureName
+    ,0 as FK_StGr,'' as Grade,DealDate as MinBLDate,@StartDate AS StartDate,@EndDate as EndDate,@ConsumeStartDate As ConsumeStartDate,@ConsumeEndDate as ConsumeEndDate
+    FROM DeaOtc deal 
+    LEFT JOIN kSysCreditStatus ON FK_K_SyCSt = PK_SyCSt
+    LEFT JOIN kSysCreditPriviledge ON FK_K_SyCPr = PK_SyCPr
+    INNER JOIN SysStructure ON PK_SySt=deal.FK_SySt
+    INNER JOIN SysDomain ON PK_SyDo = FK_SyDo
+    INNER JOIN SysProductTypes SPT ON deal.FK_SyPTy = SPT.PK_SyPTy  
+    INNER JOIN kSyscreditStructure  ON FK_SyCPTy = SPT.FK_K_SyCPTy
+    
+    OUTER APPLY(
+        SELECT SUM(NetAmountCompCCy) as NetAmountCompCCy,SUM(K_PaymentAmountCompCCy) AS K_PaymentAmountCompCCy 
+        FROM DeaOtcSettlementCost
+        WHERE CK_DeOt=PK_DeOt AND K_CreditFlag = 1
+        GROUP BY CK_DeOt
+    ) cost
+    WHERE PK_DeOt=@CK_De;
 END
 ELSE IF @FK_SyCPTy =3
 BEGIN
     SET @DealType='Spot voyage';
+    INSERT INTO @TempTable
+    SELECT @dealid as DealID,PK_DeVCh AS CK_De, 0 as LoadingId,@DealType As DealType
+    ,CASE PSFlag WHEN -1 THEN 'Sale' ELSE 'Purchase' END AS PSFlag,deal.FK_SyCrSt as  FK_K_SyCSt, StatusName as CreditStatus
+    ,FK_SyCPr as FK_K_SyCPr ,Priviledge
+    ,TotalValue,UnrealValue,CASE CrOnlySecurityLimit WHEN 0 THEN 'No' ELSE 'Yes' END AS K_CrOnlySecurityLimit
+    ,cost.NetAmountCompCCy,cost.K_PaymentAmountCompCCy,@ConsumeAmount AS ConsumeAmount,@PaidAmount As PaidAmount
+    ,deal.FK_SySt,SysStructure.Structure,DomainName,kSysCreditStructure.StructureName as CreditStructureName
+    ,0 as FK_StGr,'' as Grade,dealevent.EventDate as MinBLDate,@StartDate AS StartDate,@EndDate as EndDate,@ConsumeStartDate As ConsumeStartDate,@ConsumeEndDate as ConsumeEndDate
+    FROM kDeaVoyageCharter deal 
+    LEFT JOIN kSysCreditStatus ON FK_SyCrSt = PK_SyCSt
+    LEFT JOIN kSysCreditPriviledge ON FK_SyCPr = PK_SyCPr
+    INNER JOIN SysStructure ON PK_SySt=deal.FK_SySt
+    INNER JOIN SysDomain ON PK_SyDo = FK_SyDo
+    INNER JOIN SysProductTypes SPT ON deal.FK_SyPTy = SPT.PK_SyPTy  
+    INNER JOIN kSyscreditStructure  ON FK_SyCPTy = SPT.FK_K_SyCPTy
+    INNER JOIN kDeaVoyageCharterEvent dealevent ON deal.PK_DeVCh = dealevent.CK_DeVCh AND dealevent.FK_DeEDe = @FK_DeEDe_BL
+    OUTER APPLY(
+        SELECT SUM(NetAmountCompCCy) as NetAmountCompCCy,SUM(PaymentAmountCompCCy) AS K_PaymentAmountCompCCy 
+        FROM kDeaVoyageCharterCost
+        WHERE CK_DeVCh=PK_DeVCh AND CreditFlag = 1
+        GROUP BY CK_DeVCh
+    ) cost
+    WHERE PK_DeVCh=@CK_De;
 END
 ELSE
 BEGIN
     SET @DealType='Trans cost';
+    INSERT INTO @TempTable
+    SELECT @dealid as DealID,PK_DeSCo AS CK_De, 0 as LoadingId,@DealType As DealType
+    ,'' AS PSFlag,deal.FK_K_SyCSt as  FK_K_SyCSt, StatusName as CreditStatus
+    ,FK_K_SyCPr as FK_K_SyCPr ,Priviledge
+    ,TotalValue,UnrealValue,''  AS K_CrOnlySecurityLimit
+    ,cost.NetAmountCompCCy,cost.K_PaymentAmountCompCCy,@ConsumeAmount AS ConsumeAmount,@PaidAmount As PaidAmount
+    ,deal.FK_SySt,SysStructure.Structure,DomainName,kSysCreditStructure.StructureName as CreditStructureName
+    ,0 as FK_StGr,'' as Grade,DealDate as MinBLDate,@StartDate AS StartDate,@EndDate as EndDate,@ConsumeStartDate As ConsumeStartDate,@ConsumeEndDate as ConsumeEndDate
+    FROM DeaStructureCost deal 
+    LEFT JOIN kSysCreditStatus ON FK_K_SyCSt = PK_SyCSt
+    LEFT JOIN kSysCreditPriviledge ON FK_K_SyCPr = PK_SyCPr
+    INNER JOIN SysStructure ON PK_SySt=deal.FK_SySt
+    INNER JOIN SysDomain ON PK_SyDo = FK_SyDo
+    INNER JOIN SysProductTypes SPT ON deal.FK_SyPTy = SPT.PK_SyPTy  
+    INNER JOIN kSyscreditStructure  ON FK_SyCPTy = SPT.FK_K_SyCPTy    
+    OUTER APPLY(
+        SELECT SUM(NetAmountCompCCy) as NetAmountCompCCy,SUM(K_PaymentAmountCompCCy) AS K_PaymentAmountCompCCy 
+        FROM DeaStructureCostCost
+        WHERE CK_DeSCo=PK_DeSCo AND K_CreditFlag = 1
+        GROUP BY CK_DeSCo
+    ) cost
+    WHERE PK_DeSCo=@CK_De;      
 END
 
 declare @XML   xml = (select NEWID() as ID, *

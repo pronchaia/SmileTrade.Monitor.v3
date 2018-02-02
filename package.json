@@ -1,10 +1,13 @@
 {
     "name": "smiletrade.monitor.v3",
     "version": "1.0.0",
+    "main": "server.js",
+    "bin": "server.js",
     "scripts": {
         "client": "cd client && yarn start",
         "server": "nodemon server.js",
-        "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+        "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
+        "build": "node build"
     },
     "dependencies": {
         "config": "^1.29.2",

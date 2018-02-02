@@ -170,16 +170,319 @@ END
 ELSE IF @FK_SyCPTy =2
 BEGIN
     SET @DealType='OTC';
+
+    ----------  Credit status
+    WITH cte as (
+    SELECT oFK_K_SyCSt,AType FROM DeaOtcA WHERE oPK_DeOt = @CK_De
+    GROUP BY oFK_K_SyCSt,AType
+    )
+
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal credit status' AS AuditColumn
+        ,[StatusName] as AuditValue,[LoginName]  
+    FROM cte
+    INNER JOIN kSysCreditStatus ON oFK_K_SyCSt = PK_SyCSt
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaOtcA a
+        where a.oPK_DeOt=@CK_De and a.oFK_K_SyCSt = cte.oFK_K_SyCSt
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;
+
+    ----------  Priviledge
+    WITH cte as (
+    SELECT oFK_K_SyCPr,AType FROM DeaOtcA WHERE oPK_DeOt = @CK_De
+    GROUP BY oFK_K_SyCPr,AType
+    )
+
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal priviledge' AS AuditColumn
+        ,[Priviledge] as AuditValue,[LoginName] 
+    FROM cte
+    INNER JOIN kSysCreditPriviledge ON oFK_K_SyCPr = PK_SyCPr
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaOtcA a
+        where a.oPK_DeOt=@CK_De and a.oFK_K_SyCPr = cte.oFK_K_SyCPr
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;
+
+    ----------  Total value
+    WITH cte as (
+    SELECT oTotalValue,AType FROM DeaOtcA WHERE oPK_DeOt = @CK_De
+    GROUP BY oTotalValue,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal total Value' AS AuditColumn
+        ,FORMAT([oTotalValue],'N', 'en-us') as AuditValue,[LoginName] 
+    FROM cte    
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaOtcA a
+        where a.oPK_DeOt=@CK_De and a.oTotalValue = cte.oTotalValue
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;    
+ 
+    ----------  Loading Structure
+    WITH cte as (
+        SELECT oPK_DeOt,oFK_SySt,AType FROM DeaOtcA WHERE oPK_DeOt = @CK_De
+        GROUP BY oPK_DeOt,oFK_SySt,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Loading Structure' AS AuditColumn
+        ,[StructureName] as AuditValue,[LoginName] 
+    FROM cte    
+    INNER JOIN SysStructure ON PK_SySt = cte.oFK_SySt
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaOtcA a
+        where a.oPK_DeOt = cte.oPK_DeOt and a.oFK_SySt = cte.oFK_SySt
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;   
+ 
+    ----------  Loading Event BLDate
+    WITH cte as (
+        SELECT oDealDate,AType FROM DeaOtcA WHERE oPK_DeOt = @CK_De 
+        GROUP BY oDealDate,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Loading Event BLDate' AS AuditColumn
+        ,FORMAT([oDealDate],'dd/MM/yyyy','en-US') as AuditValue,[LoginName] 
+    FROM cte    
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(AUser) as oFK_SyUs_Modified
+        from DeaOtcA a
+        where a.oPK_DeOt=@CK_De AND a.oDealDate = cte.oDealDate
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;     
+
+
 END
 ELSE IF @FK_SyCPTy =3
 BEGIN
     SET @DealType='Spot voyage';
+
+    ----------  Credit status
+    WITH cte as (
+    SELECT oFK_SyCSt,AType FROM kDeaVoyageCharterA WHERE oPK_DeVCh = @CK_De
+    GROUP BY oFK_SyCSt,AType
+    )
+
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal credit status' AS AuditColumn
+        ,[StatusName] as AuditValue,[LoginName]  
+    FROM cte
+    INNER JOIN kSysCreditStatus ON oFK_SyCSt = PK_SyCSt
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from kDeaVoyageCharterA a
+        where a.oPK_DeVCh=@CK_De and a.oFK_SyCSt = cte.oFK_SyCSt
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;
+
+    ----------  Priviledge
+    WITH cte as (
+    SELECT oFK_SyCPr,AType FROM kDeaVoyageCharterA WHERE oPK_DeVCh = @CK_De
+    GROUP BY oFK_SyCPr,AType
+    )
+
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal priviledge' AS AuditColumn
+        ,[Priviledge] as AuditValue,[LoginName] 
+    FROM cte
+    INNER JOIN kSysCreditPriviledge ON oFK_SyCPr = PK_SyCPr
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from kDeaVoyageCharterA a
+        where a.oPK_DeVCh=@CK_De and a.oFK_SyCPr = cte.oFK_SyCPr
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;
+
+    ----------  Total value
+    WITH cte as (
+    SELECT oTotalValue,AType FROM kDeaVoyageCharterA WHERE oPK_DeVCh = @CK_De
+    GROUP BY oTotalValue,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal total Value' AS AuditColumn
+        ,FORMAT([oTotalValue],'N', 'en-us') as AuditValue,[LoginName] 
+    FROM cte    
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from kDeaVoyageCharterA a
+        where a.oPK_DeVCh=@CK_De and a.oTotalValue = cte.oTotalValue
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;    
+ 
+    ----------  Loading Structure
+    WITH cte as (
+        SELECT oPK_DeVCh,oFK_SySt,AType FROM kDeaVoyageCharterA WHERE oPK_DeVCh = @CK_De
+        GROUP BY oPK_DeVCh,oFK_SySt,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Loading Structure' AS AuditColumn
+        ,[StructureName] as AuditValue,[LoginName] 
+    FROM cte    
+    INNER JOIN SysStructure ON PK_SySt = cte.oFK_SySt
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from kDeaVoyageCharterA a
+        where a.oPK_DeVCh = cte.oPK_DeVCh and a.oFK_SySt = cte.oFK_SySt
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;   
+ 
+    ----------  Loading Event BLDate
+    WITH cte as (
+        SELECT oDealDate,AType FROM kDeaVoyageCharterA WHERE oPK_DeVCh = @CK_De 
+        GROUP BY oDealDate,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Loading Event BLDate' AS AuditColumn
+        ,FORMAT([oDealDate],'dd/MM/yyyy','en-US') as AuditValue,[LoginName] 
+    FROM cte    
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(AUser) as oFK_SyUs_Modified
+        from kDeaVoyageCharterA a
+        where a.oPK_DeVCh=@CK_De AND a.oDealDate = cte.oDealDate
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;     
+
+
 END
 ELSE
 BEGIN
     SET @DealType='Trans cost';
-END
+    ----------  Credit status
+    WITH cte as (
+    SELECT oFK_K_SyCSt,AType FROM DeaStructureCostA WHERE oPK_DeSCo = @CK_De
+    GROUP BY oFK_K_SyCSt,AType
+    )
 
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal credit status' AS AuditColumn
+        ,[StatusName] as AuditValue,[LoginName]  
+    FROM cte
+    INNER JOIN kSysCreditStatus ON oFK_K_SyCSt = PK_SyCSt
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaStructureCostA a
+        where a.oPK_DeSCo=@CK_De and a.oFK_K_SyCSt = cte.oFK_K_SyCSt
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;
+
+    ----------  Priviledge
+    WITH cte as (
+    SELECT oFK_K_SyCPr,AType FROM DeaStructureCostA WHERE oPK_DeSCo = @CK_De
+    GROUP BY oFK_K_SyCPr,AType
+    )
+
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal priviledge' AS AuditColumn
+        ,[Priviledge] as AuditValue,[LoginName] 
+    FROM cte
+    INNER JOIN kSysCreditPriviledge ON oFK_K_SyCPr = PK_SyCPr
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaStructureCostA a
+        where a.oPK_DeSCo=@CK_De and a.oFK_K_SyCPr = cte.oFK_K_SyCPr
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;
+
+    ----------  Total value
+    WITH cte as (
+    SELECT oTotalValue,AType FROM DeaStructureCostA WHERE oPK_DeSCo = @CK_De
+    GROUP BY oTotalValue,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Deal total Value' AS AuditColumn
+        ,FORMAT([oTotalValue],'N', 'en-us') as AuditValue,[LoginName] 
+    FROM cte    
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaStructureCostA a
+        where a.oPK_DeSCo=@CK_De and a.oTotalValue = cte.oTotalValue
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;    
+ 
+    ----------  Loading Structure
+    WITH cte as (
+        SELECT oPK_DeSCo,oFK_SySt,AType FROM DeaStructureCostA WHERE oPK_DeSCo = @CK_De
+        GROUP BY oPK_DeSCo,oFK_SySt,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Loading Structure' AS AuditColumn
+        ,[StructureName] as AuditValue,[LoginName] 
+    FROM cte    
+    INNER JOIN SysStructure ON PK_SySt = cte.oFK_SySt
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(oFK_SyUs_Modified) as oFK_SyUs_Modified
+        from DeaStructureCostA a
+        where a.oPK_DeSCo = cte.oPK_DeSCo and a.oFK_SySt = cte.oFK_SySt
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;   
+ 
+    ----------  Loading Event BLDate
+    WITH cte as (
+        SELECT oDealDate,AType FROM DeaStructureCostA WHERE oPK_DeSCo = @CK_De 
+        GROUP BY oDealDate,AType
+    )
+    INSERT INTO @TempTable 
+    SELECT CASE AType WHEN 1 THEN 'Insert' WHEN 2 THEN 'Update' WHEN 3 THEN 'Delete' ELSE '-' END AS AType,ATime,'Loading Event BLDate' AS AuditColumn
+        ,FORMAT([oDealDate],'dd/MM/yyyy','en-US') as AuditValue,[LoginName] 
+    FROM cte    
+    outer apply(
+        select top 1 MIN(ATime) as ATime,MIN(AUser) as oFK_SyUs_Modified
+        from DeaStructureCostA a
+        where a.oPK_DeSCo=@CK_De AND a.oDealDate = cte.oDealDate
+        and a.AType = cte.AType
+        order by ATime
+    ) credit_audit
+    INNER JOIN SysUser ON oFK_SyUs_Modified = PK_SyUs
+    ORDER BY ATime;     
+    
+END
 
 
 declare @XML   xml = (select ROW_NUMBER()  OVER(ORDER BY AuditColumn,ATime ASC) ID, *
