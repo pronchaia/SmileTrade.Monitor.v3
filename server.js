@@ -5,6 +5,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 
+console.log(config.get('connection'));
 app.use(function (req, res, next) {
     req.query = tediousExpress(req, config.get('connection'));
     next();
